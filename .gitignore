@@ -18,3 +18,5 @@ tests/testpr-ut2
 tests/__pycache__
 
 testproject/main
+
+rpmbuild/

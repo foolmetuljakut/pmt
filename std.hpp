@@ -15,5 +15,6 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include <map>
 
 #endif // pmt_std_hpp

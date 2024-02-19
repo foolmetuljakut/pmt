@@ -1,19 +1,9 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <memory>
-#include <filesystem>
-// #include <boost/program_options.hpp>
-// using namespace boost::program_options;
-
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/array.hpp>
-using boost::property_tree::ptree,
-        boost::property_tree::write_json;
+#include "std.hpp"
+#include "boost.hpp"
 
 #include "solution.hpp"
 
-#define PMTVERSION "0.5"
+#include "cmdparser.hpp"
 
 int main1(int argc, char **argv) {
     Pmt::File file("cpi/cpi.cpp");
@@ -128,7 +118,7 @@ void fe_execution(std::vector<std::string>& args) {
     }
 }
 
-int main(int argc, char **argv) {
+int main6(int argc, char **argv) {
     std::vector<std::string> args;
     for(unsigned i = 1; i < argc; i++) {
         auto arg = std::string(argv[i]);
@@ -317,3 +307,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+int main( int argc, char **argv) {
+    Pmt::CmdParser parser(argc, argv);
+    parser.parseInstructions();
+}
