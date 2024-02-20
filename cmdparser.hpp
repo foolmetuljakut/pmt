@@ -2,7 +2,9 @@
 #define PMT_CMDPARSER_HPP
 
 #include "std.hpp"
-#include "pmtexception.hpp"
+#include "boost.hpp"
+
+#include "solution.hpp"
 
 #define PMTVERSION "0.7"
 
@@ -65,7 +67,7 @@ namespace Pmt {
         std::vector<std::string> args;
         void separateOptions(std::string& arg);
         void setCurrentMode();
-        bool changeCreationMode(Modes::CreationMode m);
+        void changeCreationMode(Modes::CreationMode m);
         void interpretAsCreation();
         void interpretAsMod();
         void interpretAsExe();

@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pmt-0.7.0",
-            "args": ["-spt", "-clf", "file", "file", "file", "file"],
+            "args": ["create", "-spt", "target", "-clf", "file", "file", "file", "file"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

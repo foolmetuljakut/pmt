@@ -87,30 +87,117 @@ void CmdParser::setCurrentMode() {
     } else {
         throw PmtException({"first keyword must be either 'create', 'mod' or 'exe'"});
     }
+    args.erase(args.begin());
 }
 
-bool CmdParser::changeCreationMode(Modes::CreationMode m)
+void CmdParser::changeCreationMode(Modes::CreationMode m)
 {
-    switch(currentMode) {
+    switch(creationMode) {
         case Modes::Structure:
-            return m == Modes::Project;
+            if(m == Modes::Project) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         case Modes::Project:
-            return m == Modes::Target;
+            if(m == Modes::Target) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         case Modes::Target:
-            return (m | Modes::CompilerOptions > 0) || (m | Modes::Project > 0);
+            if ((m | Modes::CompilerOptions > 0) || (m | Modes::Project > 0)) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         case Modes::CompilerOptions:
-            return (m | Modes::LinkerOptions > 0) || (m | Modes::Project > 0);
+            if ((m | Modes::LinkerOptions > 0) || (m | Modes::Project > 0)) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         case Modes::LinkerOptions:
-            return (m | Modes::FileList > 0) || (m | Modes::Project > 0);
+            if ((m | Modes::FileList > 0) || (m | Modes::Project > 0)) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         case Modes::FileList:
-            return m == Modes::Project;
+            if (m == Modes::Project) {
+                creationMode = m;
+                return;
+            } else {
+                throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
+            }
         default:
-            return false;
+            throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(m), " not allowed"});
     }
 }
 
+#define throwCreationModeException(mode) throw PmtException({"creation mode: transition from ", std::to_string(creationMode), " to ", std::to_string(mode), " not allowed"})
+
 void CmdParser::interpretAsCreation() {
-    
+    Solution sol;
+
+    std::map<std::string, Modes::CreationMode> transitions {
+      {"-s", Modes::Structure},
+      {"-p", Modes::Project},
+      {"-t", Modes::Target},
+      {"-c", Modes::CompilerOptions},
+      {"-l", Modes::LinkerOptions},
+      {"-f", Modes::FileList}
+    };
+
+    for(auto& instr : args) {
+        std::cout << instr << std::endl;
+
+        /*bug potential:
+            only change state, if the next expected state is given by instr
+            otherwise by defining compiler flags or linker flags
+            that are the same as a transition key by accident
+            we switch a state!*/
+        if(instr.rfind("-", 0) != std::string::npos) {
+            if(!instr.compare("-s")) {
+                if(creationMode != Modes::Structure) {
+                    changeCreationMode(Modes::Structure);
+                    continue;
+                }
+            } else {
+                changeCreationMode(transitions.find(instr)->second);
+                continue;
+            }
+        }
+        
+        // ! string.startsWith
+        if(creationMode == Modes::Structure && 
+            sol.solutionfilename.size() == 0 && 
+            instr.rfind("-", 0) == std::string::npos) {
+            sol.solutionfilename = instr;
+        } else if(creationMode == Modes::Project) {
+            if(sol.solutionfilename.size() == 0 && instr.rfind("-", 0) == std::string::npos) {
+                sol.solutionfilename = instr;
+                sol.mainapp.spec.name = instr;
+            }
+        } else if(creationMode == Modes::Target) {
+
+            // string.startsWith
+            if(instr.rfind("-", 0) != std::string::npos) {
+                throw PmtException({"after specifying a target a name must be given."});
+            }
+
+            if(sol.solutionfilename.size() == 0) {
+                sol.solutionfilename = instr;
+                sol.mainapp.spec.name = instr;
+            }
+
+        }
+    }
 }
 
 void CmdParser::interpretAsMod() {
