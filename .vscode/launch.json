@@ -5,8 +5,8 @@
             "name": "debug pmt",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/pmt-0.7.0",
-            "args": ["create", "-spt", "target", "-clf", "file", "file", "file", "file"],
+            "program": "${workspaceFolder}/tests/no-uts",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -19,8 +19,7 @@
                 "text": "-enable-pretty-printing",
                 "ignoreFailures": true
               }
-            ],
-            "preLaunchTask": "g++ via pmt"
+            ]
           }
     ]
 }
